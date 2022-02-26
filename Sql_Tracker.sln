@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sql_Tracker", "Sql_Tracker\Sql_Tracker.csproj", "{F94ADE6A-BE10-499D-ADFC-3A966DA22FEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sql_Tracker.Engine", "Sql_Tracker.Engine\Sql_Tracker.Engine.csproj", "{5317C41F-7D5A-43AB-94CD-7A6E31167EF1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F94ADE6A-BE10-499D-ADFC-3A966DA22FEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F94ADE6A-BE10-499D-ADFC-3A966DA22FEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F94ADE6A-BE10-499D-ADFC-3A966DA22FEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F94ADE6A-BE10-499D-ADFC-3A966DA22FEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5317C41F-7D5A-43AB-94CD-7A6E31167EF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5317C41F-7D5A-43AB-94CD-7A6E31167EF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5317C41F-7D5A-43AB-94CD-7A6E31167EF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5317C41F-7D5A-43AB-94CD-7A6E31167EF1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {60569534-FF3D-41E3-92B6-C4BE784C0D53}
+	EndGlobalSection
+EndGlobal
