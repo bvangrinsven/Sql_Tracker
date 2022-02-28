@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Microsoft.Extensions.Logging;
+using Sql_Tracker.Engine.DataAccess;
 using Sql_Tracker.Engine.Interfaces;
 using Sql_Tracker.Engine.Process;
 using Sql_Tracker.Engine.Utilz;
@@ -36,6 +37,9 @@ namespace Sql_Tracker.Engine
 
             builder.RegisterType<Config>().As<IConfig>().SingleInstance();
 
+            builder.RegisterType<Settings>().As<ISettings>().SingleInstance();
+
+            builder.RegisterType<MssqlDBExecute>().As<IDBExecute>().SingleInstance();
         }
 
         private static void ConfigureLogging(ILoggingBuilder log)

@@ -39,6 +39,8 @@ namespace Sql_Tracker
             {
                 ILogger<Program> log = scope.Resolve<ILogger<Program>>();
 
+                log.LogInformation("Run Path: {0}", Sql_Tracker.Engine.Utilz.Generator.GetAssemblyPath());
+
                 if (options.InitDB)
                 {
                     log.LogInformation("Init DB");

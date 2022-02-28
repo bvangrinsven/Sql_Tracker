@@ -1,0 +1,7 @@
+{
+    "id":"d51574b2-15a1-400a-9262-3f37d59f48c4",
+    "name": "Database Size",
+    "queryfile":"dbsize_query.sql",
+    "createtablefile":"dbsize_create.sql",
+    "insertrecordfile":"dbsize_insert.sql"
+}

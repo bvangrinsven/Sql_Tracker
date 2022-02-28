@@ -123,18 +123,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Factories\CreateObject.cs" />
     <Compile Include="Interfaces\IConfig.cs" />
+    <Compile Include="Interfaces\IDBExecute.cs" />
     <Compile Include="Interfaces\IInitDB.cs" />
     <Compile Include="Interfaces\IProcess.cs" />
     <Compile Include="Interfaces\IPullStats.cs" />
+    <Compile Include="Interfaces\ISettings.cs" />
+    <Compile Include="Models\DataBaseInfo.cs" />
     <Compile Include="Models\QueryFileInfo.cs" />
+    <Compile Include="Models\ServerInfo.cs" />
+    <Compile Include="Models\QueryParameter.cs" />
     <Compile Include="Process\InitDB.cs" />
     <Compile Include="Process\ProcessLog.cs" />
     <Compile Include="Process\PullStats.cs" />
     <Compile Include="ProgramModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilz\Config.cs" />
+    <Compile Include="DataAccess\MssqlDBExecute.cs" />
     <Compile Include="Utilz\Generator.cs" />
+    <Compile Include="Utilz\Settings.cs" />
+    <Compile Include="Utilz\TypeConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
