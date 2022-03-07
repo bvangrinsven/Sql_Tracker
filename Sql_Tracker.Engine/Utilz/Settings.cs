@@ -15,16 +15,11 @@ namespace Sql_Tracker.Engine.Utilz
         {
             _config = config;
 
-            ReportingServer = _config.GetString("reportingserver");
-            ReportingDB = _config.GetString("reportingdb");
-
             ConnectionString = _config.GetString("connectionstring");
 
             SqlFiles = _config.GetString("sqlfiles");
         }
 
-        public string ReportingServer { get; set; }
-        public string ReportingDB { get; set; }
         public string ConnectionString { get; private set; }
         public string SqlFiles { get; set; }
     }
