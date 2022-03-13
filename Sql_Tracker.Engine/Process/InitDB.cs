@@ -45,17 +45,46 @@ namespace Sql_Tracker.Engine.Process
                 QueryFileInfo qFileInfo = CreateObject.PopQueryFileInfoFromFile(queryFile);
 
                 string createTableSql = Path.Combine(sqlFilesPath, qFileInfo.CreateTableFile);
+                string existsTableSql = Path.Combine(sqlFilesPath, qFileInfo.ExistsTableFile);
 
                 log.LogInformation("        id: {0}", qFileInfo.Id);
                 log.LogInformation("        Name: {0}", qFileInfo.Name);
+                log.LogInformation("        Type: {0}", qFileInfo.QueryType);
                 log.LogInformation("        CreateTableFile: {0}", createTableSql);
+                log.LogInformation("        ExistsTableFile: {0}", existsTableSql);
 
-                if (createTableSql.Length > 0)
+                if (createTableSql.Length > 0 && existsTableSql.Length > 0)
                 {
-
+                    bool createTable = false;
+                    string existsSql = File.ReadAllText(existsTableSql);
                     string createSql = File.ReadAllText(createTableSql);
 
-                    _db.ExecuteNonQuery(createSql);
+                    object result = _db.ExecuteScalar(existsSql);
+                    int numTables = 0;
+
+                    if (int.TryParse(result.ToString(), out numTables))
+                    {
+                        if (numTables == 0)
+                            createTable = true;
+                    }
+
+                    if (createTable == true)
+                    {
+                        string[] splitter = new string[] { "\r\nGO" };
+                        string[] commandTexts = createSql.Split(splitter, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string commandText in commandTexts)
+                        {
+                            try
+                            {
+                                _db.ExecuteNonQuery(commandText);
+                            }
+                            catch (Exception ex)
+                            {
+                                log.LogError(ex, "Error during this command: {0}", commandText);
+                            }
+                            
+                        }                        
+                    }
 
                 }
             }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Sql_Tracker.Engine.Models;
 using Sql_Tracker.Engine.Utilz;
+using PetaPoco;
 
 namespace Sql_Tracker.Engine.DataAccess
 
@@ -17,9 +18,14 @@ namespace Sql_Tracker.Engine.DataAccess
         public MssqlDBExecute(ISettings settings)
         {
             ConnectionString = settings.ConnectionString;
+
+
+            pdb = new PetaPoco.Database(ConnectionString);
         }
 
         public string ConnectionString { get; set; }
+
+        public PetaPoco.Database pdb { get; set; }
 
         public DataTable ExecuteDataTable(string sql, params QueryParameter[] parameters)
         {
@@ -215,7 +221,7 @@ namespace Sql_Tracker.Engine.DataAccess
                 sqlParameter = new SqlParameter(queryParameter.Name, queryParameter.Value);
             else
                 sqlParameter = new SqlParameter(queryParameter.Name, DBNull.Value);
-            
+
             sqlParameter.SqlDbType = TypeConvertor.ToSqlDbType(queryParameter.DbType);
 
             if (queryParameter.Size != 0)
@@ -223,6 +229,76 @@ namespace Sql_Tracker.Engine.DataAccess
 
             return sqlParameter;
         }
+
+        public object ExecuteScalar(string sql)
+        {
+            return ExecuteScalar(ConnectionString, sql);
+        }
+
+        public object ExecuteScalar(string sql, params QueryParameter[] parameters)
+        {
+            return ExecuteScalar(ConnectionString, sql, parameters);
+        }
+
+        public object ExecuteScalar(string connectionString, string sql)
+        {
+            return ExecuteScalar(connectionString, sql, null);
+        }
+
+        public object ExecuteScalar(string connectionString, string sql, params QueryParameter[] parameters)
+        {
+
+            SqlParameter[] oSqlParameters = null;
+
+            if (parameters != null && parameters.Length > 0)
+            {
+                oSqlParameters = new SqlParameter[parameters.Length];
+                int x = 0;
+
+                foreach (var parameter in parameters)
+                {
+                    oSqlParameters[x] = ConvertFromGeneric(parameter);
+                    x++;
+                }
+            }
+
+            //pass through the call providing null for the set of SqlParameters
+            //return ExecuteNonQuery(connectionString, commandType, commandText, (SqlParameter[])null);
+            return ExecuteScalar(connectionString, CommandType.Text, sql, oSqlParameters);
+        }
+
+        public object ExecuteScalar(string connectionString, CommandType commandType, string commandText, params SqlParameter[] commandParameters)
+        {
+            //create & open a SqlConnection, and dispose of it after we are done.
+            using (SqlConnection cn = new SqlConnection(connectionString))
+            {
+                cn.Open();
+                object retval = new object();
+
+                try
+                {
+                    //create a command and prepare it for execution
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.CommandTimeout = 3600;
+                    PrepareCommand(cmd, cn, null, commandType, commandText, commandParameters);
+
+                    //finally, execute the command.
+                    retval = cmd.ExecuteScalar();
+
+                    // detach the SqlParameters from the command object, so they can be used again.
+                    cmd.Parameters.Clear();
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Commit Exception Type: {0}", ex.GetType());
+                    Console.WriteLine("  Message: {0}", ex.Message);
+                }
+
+                return retval;
+            }
+        }
+
 
     }
 }

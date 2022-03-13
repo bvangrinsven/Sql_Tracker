@@ -1,0 +1,7 @@
+{
+    "id":"ab8a105c-08ef-470b-ae14-1de92f6575b0",
+    "name": "Required Schema",
+    "querytype": 98,
+    "existstablefile":"requiredschema_exists.sql",
+    "createtablefile":"requiredschema_create.sql"
+}

@@ -19,8 +19,15 @@ namespace Sql_Tracker
             [Option(Default = false, SetName = "initdb", HelpText = "Init Database")]
             public bool InitDB { get; set; }
 
+            [Option(Default = false, SetName = "popservers", HelpText = "Populate Servers")]
+            public bool PopulateServer { get; set; }
+
             [Option(Default = false, SetName = "pullstats", HelpText = "Pull Database Stats")]
             public bool PullStats { get; set; }
+
+            [Option(Default = false, SetName = "showwizard", HelpText = "Show the Populate Server Wizard")]
+            public bool PopServerShowWizard { get; set; }
+
         }
 
         static Options options { get; set; }
@@ -48,6 +55,14 @@ namespace Sql_Tracker
                     initdb.Execute();
                 }
 
+                if (options.PopulateServer)
+                {
+                    log.LogInformation("Populate Servers");
+                    var popserver = scope.Resolve<IPopulateServer>();
+                    popserver.ShowWizard = options.PopServerShowWizard;
+                    popserver.Execute();
+                }
+
                 if (options.PullStats)
                 {
                     log.LogInformation("Pull Stats");
@@ -57,7 +72,11 @@ namespace Sql_Tracker
 
             }
 
-            Console.ReadKey();
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                Console.Write("Press Any key to continue . . . ");
+                Console.ReadKey(true);
+            }
         }
         private static void Run(Options opts)
         {

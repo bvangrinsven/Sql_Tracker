@@ -32,14 +32,17 @@ namespace Sql_Tracker.Engine
                 .As(typeof(ILogger<>))
                 .SingleInstance();
 
+            builder.RegisterType<MssqlDBExecute>().As<IDBExecute>().SingleInstance();
+
             builder.RegisterType<InitDB>().As<IInitDB>();
+            builder.RegisterType<PopulateServer>().As<IPopulateServer>();
             builder.RegisterType<PullStats>().As<IPullStats>();
 
             builder.RegisterType<Config>().As<IConfig>().SingleInstance();
 
             builder.RegisterType<Settings>().As<ISettings>().SingleInstance();
 
-            builder.RegisterType<MssqlDBExecute>().As<IDBExecute>().SingleInstance();
+
         }
 
         private static void ConfigureLogging(ILoggingBuilder log)
