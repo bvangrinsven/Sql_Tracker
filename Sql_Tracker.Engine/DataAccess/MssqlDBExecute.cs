@@ -18,14 +18,9 @@ namespace Sql_Tracker.Engine.DataAccess
         public MssqlDBExecute(ISettings settings)
         {
             ConnectionString = settings.ConnectionString;
-
-
-            pdb = new PetaPoco.Database(ConnectionString);
         }
 
         public string ConnectionString { get; set; }
-
-        public PetaPoco.Database pdb { get; set; }
 
         public DataTable ExecuteDataTable(string sql, params QueryParameter[] parameters)
         {
@@ -44,6 +39,25 @@ namespace Sql_Tracker.Engine.DataAccess
             }
 
             return ExecuteDataTable(ConnectionString, CommandType.Text, sql, oSqlParameters);
+        }
+
+        public DataTable ExecuteDataTable(string sql, string connectionstring, params QueryParameter[] parameters)
+        {
+            SqlParameter[] oSqlParameters = null;
+
+            if (parameters.Length > 0)
+            {
+                oSqlParameters = new SqlParameter[parameters.Length];
+                int x = 0;
+
+                foreach (var parameter in parameters)
+                {
+                    oSqlParameters[x] = ConvertFromGeneric(parameter);
+                    x++;
+                }
+            }
+
+            return ExecuteDataTable(connectionstring, CommandType.Text, sql, oSqlParameters);
         }
 
         public int ExecuteNonQuery(string sql)
@@ -218,9 +232,9 @@ namespace Sql_Tracker.Engine.DataAccess
             SqlParameter sqlParameter = new SqlParameter();
 
             if (queryParameter.Value != null)
-                sqlParameter = new SqlParameter(queryParameter.Name, queryParameter.Value);
+                sqlParameter = new SqlParameter(queryParameter.ParamName, queryParameter.Value);
             else
-                sqlParameter = new SqlParameter(queryParameter.Name, DBNull.Value);
+                sqlParameter = new SqlParameter(queryParameter.ParamName, DBNull.Value);
 
             sqlParameter.SqlDbType = TypeConvertor.ToSqlDbType(queryParameter.DbType);
 

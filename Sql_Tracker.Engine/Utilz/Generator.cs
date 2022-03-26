@@ -63,5 +63,22 @@ namespace Sql_Tracker.Engine.Utilz
             }
             return obj;
         }
+
+        public static QueryParameter[] CreateQueryParametersFromDT(DataTable dt)
+        {
+            QueryParameter[] parameters = new QueryParameter[dt.Columns.Count];
+
+            for (int i = 0; i < dt.Columns.Count; i++)
+            {
+                QueryParameter tmp = new QueryParameter();
+
+                tmp.Name = dt.Columns[i].ColumnName;
+                tmp.DbType = TypeConvertor.ToDbType(dt.Columns[i].DataType);
+                tmp.Size = dt.Columns[i].MaxLength;
+                parameters[i] = tmp;
+            }
+
+            return parameters;
+        }
     }
 }

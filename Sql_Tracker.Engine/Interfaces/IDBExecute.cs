@@ -15,6 +15,8 @@ namespace Sql_Tracker.Engine.Interfaces
 
         int ExecuteNonQuery(string sql);
         int ExecuteNonQuery(string sql, params QueryParameter[] parameters);
+
+        DataTable ExecuteDataTable(string sql, string connectionstring, params QueryParameter[] parameters);
         DataTable ExecuteDataTable(string sql, params QueryParameter[] parameters);
         object ExecuteScalar(string sql);
         object ExecuteScalar(string sql, params QueryParameter[] parameters);

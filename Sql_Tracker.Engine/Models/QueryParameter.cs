@@ -15,5 +15,6 @@ namespace Sql_Tracker.Engine.Models
         public DbType DbType { get; set; } = DbType.String;
         public int Size { get; set; } = 0;
 
+        public string ParamName { get { return "@" + Name; } }
     }
 }
