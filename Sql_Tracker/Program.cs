@@ -59,7 +59,6 @@ namespace Sql_Tracker
                 {
                     log.LogInformation("Populate Servers");
                     var popserver = scope.Resolve<IPopulateServer>();
-                    popserver.ShowWizard = options.PopServerShowWizard;
                     popserver.Execute();
                 }
 
