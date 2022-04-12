@@ -37,6 +37,7 @@ namespace Sql_Tracker.Engine
             builder.RegisterType<InitDB>().As<IInitDB>();
             builder.RegisterType<PopulateServer>().As<IPopulateServer>();
             builder.RegisterType<PullStats>().As<IPullStats>();
+            builder.RegisterType<ServerWizard>().As<IServerWizard>();
 
             builder.RegisterType<Config>().As<IConfig>().SingleInstance();
 

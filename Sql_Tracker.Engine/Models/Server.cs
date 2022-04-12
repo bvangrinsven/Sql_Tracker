@@ -13,5 +13,10 @@ namespace Sql_Tracker.Engine.Models
         public string ConnectionString { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateModified { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

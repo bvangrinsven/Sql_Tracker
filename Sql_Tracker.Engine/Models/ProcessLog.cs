@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sql_Tracker.Engine.Process
+namespace Sql_Tracker.Engine.Models
 {
     public class ProcessLog
     {

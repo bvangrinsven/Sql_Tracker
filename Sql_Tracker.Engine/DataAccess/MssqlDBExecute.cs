@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Sql_Tracker.Engine.Models;
 using Sql_Tracker.Engine.Utilz;
-using PetaPoco;
 
 namespace Sql_Tracker.Engine.DataAccess
 

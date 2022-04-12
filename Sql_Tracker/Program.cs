@@ -26,7 +26,7 @@ namespace Sql_Tracker
             public bool PullStats { get; set; }
 
             [Option(Default = false, SetName = "showwizard", HelpText = "Show the Populate Server Wizard")]
-            public bool PopServerShowWizard { get; set; }
+            public bool ShowWizard { get; set; }
 
         }
 
@@ -67,6 +67,12 @@ namespace Sql_Tracker
                     log.LogInformation("Pull Stats");
                     var pullStats = scope.Resolve<IPullStats>();
                     pullStats.Execute();
+                }
+
+                if (options.ShowWizard)
+                {
+                    var serverWizard = scope.Resolve<IServerWizard>();
+                    serverWizard.Execute();
                 }
 
             }
