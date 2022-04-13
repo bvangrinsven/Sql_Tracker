@@ -43,6 +43,7 @@ namespace Sql_Tracker.Engine
 
             builder.RegisterType<Settings>().As<ISettings>().SingleInstance();
 
+            builder.RegisterType<Creds>().As<ICreds>().SingleInstance();
 
         }
 

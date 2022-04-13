@@ -11,5 +11,8 @@ namespace Sql_Tracker.Engine.Interfaces
         string ConnectionString { get; }
         string SqlFiles { get; set; }
 
+        string CredKeyFile { get; }
+        string CredFile { get; }
+
     }
 }
