@@ -8,14 +8,19 @@ using System.Threading.Tasks;
 using System.Data.SqlClient;
 using Sql_Tracker.Engine.Models;
 using Sql_Tracker.Engine.Utilz;
+using Sql_Tracker.Engine.Utilz.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Sql_Tracker.Engine.DataAccess
 
 {
     public class MssqlDBExecute : IDBExecute
     {
-        public MssqlDBExecute(ISettings settings)
+        private ILogger<MssqlDBExecute> log;
+
+        public MssqlDBExecute(ISettings settings, ILogger<MssqlDBExecute> logger)
         {
+            log = logger;
             ConnectionString = settings.ConnectionString;
         }
 
@@ -312,6 +317,54 @@ namespace Sql_Tracker.Engine.DataAccess
             }
         }
 
+        public void ExecuteUpSert(string connectionString, DataTable sourceData, string UpSertSql, string DataTableTypeName, params QueryParameter[] parameters)
+        {
+            if (UpSertSql.IsNotEmpty())
+            {
+                if (sourceData.IsValid())
+                {
+                    using (SqlConnection connection = new SqlConnection(connectionString))
+                    {
+                        connection.Open();
+
+                        // Configure the command and parameter.  
+                        SqlCommand insertCommand = new SqlCommand(UpSertSql, connection);
+                        insertCommand.CommandTimeout = 9000;
+                        SqlParameter tvpParam = insertCommand.Parameters.AddWithValue("@inputTable", sourceData);
+                        tvpParam.SqlDbType = SqlDbType.Structured;
+                        tvpParam.TypeName = "dbo." + DataTableTypeName;
+
+                        SqlParameter[] oSqlParameters = null;
+
+                        if (parameters != null && parameters.Length > 0)
+                        {
+                            oSqlParameters = new SqlParameter[parameters.Length];
+                            int x = 0;
+
+                            foreach (var parameter in parameters)
+                            {
+                                oSqlParameters[x] = ConvertFromGeneric(parameter);
+                                x++;
+                            }
+                        }
+
+                        // Execute the command.  
+                        insertCommand.ExecuteNonQuery();
+                    }
+                }
+                else
+                {
+                    log.LogInformation("  - Nothing to Process");
+                }
+
+
+                log.LogInformation("---- Finished - UpSert ---");
+
+            }
+
+            log.LogInformation(" --== ExecuteUpSert - End ==-- ");
+
+        }
 
     }
 }

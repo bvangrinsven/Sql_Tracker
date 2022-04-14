@@ -19,7 +19,7 @@ namespace Sql_Tracker
             [Option(Default = false, SetName = "initdb", HelpText = "Init Database")]
             public bool InitDB { get; set; }
 
-            [Option(Default = false, SetName = "popservers", HelpText = "Populate Servers")]
+            [Option(Default = false, SetName = "populateserver", HelpText = "Populate Servers")]
             public bool PopulateServer { get; set; }
 
             [Option(Default = false, SetName = "pullstats", HelpText = "Pull Database Stats")]
@@ -27,6 +27,10 @@ namespace Sql_Tracker
 
             [Option(Default = false, SetName = "showwizard", HelpText = "Show the Populate Server Wizard")]
             public bool ShowWizard { get; set; }
+
+            [Option(Default = false, SetName = "credtest", HelpText = "test credentials")]
+            public bool credtest { get; set; }
+
 
         }
 
@@ -73,6 +77,12 @@ namespace Sql_Tracker
                 {
                     var serverWizard = scope.Resolve<IServerWizard>();
                     serverWizard.Execute();
+                }
+
+                if(options.credtest)
+                {
+                    var credtesting = scope.Resolve<ICredTest>();
+                    credtesting.Execute();
                 }
 
             }

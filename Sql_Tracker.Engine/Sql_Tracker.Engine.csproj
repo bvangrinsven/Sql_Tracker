@@ -135,9 +135,10 @@
   <ItemGroup>
     <Compile Include="Factories\CreateObject.cs" />
     <Compile Include="Interfaces\IConfig.cs" />
-    <Compile Include="Interfaces\ICreds.cs" />
+    <Compile Include="Interfaces\ICredTest.cs" />
     <Compile Include="Interfaces\IDBExecute.cs" />
     <Compile Include="Interfaces\IInitDB.cs" />
+    <Compile Include="Interfaces\IModel.cs" />
     <Compile Include="Interfaces\IPopulateServer.cs" />
     <Compile Include="Interfaces\IProcess.cs" />
     <Compile Include="Interfaces\IPullStats.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="Models\Server.cs" />
     <Compile Include="Models\QueryParameter.cs" />
     <Compile Include="Models\DatabaseTable.cs" />
+    <Compile Include="Process\CredTest.cs" />
     <Compile Include="Process\InitDB.cs" />
     <Compile Include="Process\PopulateServer.cs" />
     <Compile Include="Models\ProcessLog.cs" />
@@ -158,7 +160,6 @@
     <Compile Include="Utilz\Config.cs" />
     <Compile Include="DataAccess\MssqlDBExecute.cs" />
     <Compile Include="Utilz\Constants.cs" />
-    <Compile Include="Utilz\Creds.cs" />
     <Compile Include="Utilz\Extensions\DataRowExt.cs" />
     <Compile Include="Utilz\Extensions\DataTableExt.cs" />
     <Compile Include="Utilz\Extensions\Validate.cs" />

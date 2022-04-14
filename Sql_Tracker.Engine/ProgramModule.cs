@@ -32,6 +32,9 @@ namespace Sql_Tracker.Engine
                 .As(typeof(ILogger<>))
                 .SingleInstance();
 
+            builder.RegisterType<Config>().As<IConfig>().SingleInstance();
+            builder.RegisterType<Settings>().As<ISettings>().SingleInstance();
+
             builder.RegisterType<MssqlDBExecute>().As<IDBExecute>().SingleInstance();
 
             builder.RegisterType<InitDB>().As<IInitDB>();
@@ -39,11 +42,7 @@ namespace Sql_Tracker.Engine
             builder.RegisterType<PullStats>().As<IPullStats>();
             builder.RegisterType<ServerWizard>().As<IServerWizard>();
 
-            builder.RegisterType<Config>().As<IConfig>().SingleInstance();
-
-            builder.RegisterType<Settings>().As<ISettings>().SingleInstance();
-
-            builder.RegisterType<Creds>().As<ICreds>().SingleInstance();
+            builder.RegisterType<CredTest>().As<ICredTest>().SingleInstance();
 
         }
 

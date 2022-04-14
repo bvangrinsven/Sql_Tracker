@@ -20,5 +20,7 @@ namespace Sql_Tracker.Engine.Interfaces
         DataTable ExecuteDataTable(string sql, params QueryParameter[] parameters);
         object ExecuteScalar(string sql);
         object ExecuteScalar(string sql, params QueryParameter[] parameters);
+
+        void ExecuteUpSert(string connectionString, DataTable sourceData, string UpSertSql, string DataTableTypeName, params QueryParameter[] parameters);
     }
 }

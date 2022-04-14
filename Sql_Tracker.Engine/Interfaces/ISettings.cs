@@ -14,5 +14,10 @@ namespace Sql_Tracker.Engine.Interfaces
         string CredKeyFile { get; }
         string CredFile { get; }
 
+        string GetPassword(string source);
+        string GetUsername(string source);
+        void SetPassword(string source, string username, string password);
+        void ReadAllFromCurrent(string source);
+
     }
 }
