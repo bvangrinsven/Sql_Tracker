@@ -50,7 +50,12 @@ namespace Sql_Tracker.Engine
         {
             log.ClearProviders();
             log.SetMinimumLevel(LogLevel.Information);
-            log.AddConsole();
+            log.AddSimpleConsole(options =>
+            {
+                options.IncludeScopes = true;
+                options.SingleLine = true;
+                options.TimestampFormat = "hh:mm:ss ";
+            });
         }
     }
 }

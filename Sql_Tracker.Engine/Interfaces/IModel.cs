@@ -11,7 +11,6 @@ namespace Sql_Tracker.Engine.Interfaces
 
         string GetObjectsSql();
         string GetUpsertSql();
-        string GetRelatedSql();
         string[] GetPreUpsertSql();
         string[] GetPostUpsertSql();
 

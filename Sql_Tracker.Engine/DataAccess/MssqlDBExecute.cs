@@ -317,12 +317,25 @@ namespace Sql_Tracker.Engine.DataAccess
             }
         }
 
+        public void ExecuteUpSert(DataTable sourceData, string UpSertSql, string DataTableTypeName, params QueryParameter[] parameters)
+        {
+            ExecuteUpSert(ConnectionString, sourceData, UpSertSql, DataTableTypeName, parameters);
+        }
+
         public void ExecuteUpSert(string connectionString, DataTable sourceData, string UpSertSql, string DataTableTypeName, params QueryParameter[] parameters)
         {
+            log.LogInformation(" --== ExecuteUpSert - Start ==-- ");
             if (UpSertSql.IsNotEmpty())
             {
+                log.LogInformation("--- Start - UpSert ---");
+
+                log.LogInformation("  - sourceData.IsValid() = {0}", sourceData.IsValid());
+
                 if (sourceData.IsValid())
                 {
+
+                    Console.WriteLine(" >> Pushing {0} - {1} to the Destination Database.", sourceData.Rows.Count, DataTableTypeName);
+
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {
                         connection.Open();
@@ -364,6 +377,27 @@ namespace Sql_Tracker.Engine.DataAccess
 
             log.LogInformation(" --== ExecuteUpSert - End ==-- ");
 
+        }
+
+        public void ExecuteSqlList(string[] oSqlList)
+        {
+            ExecuteSqlList(ConnectionString, oSqlList);
+        }
+
+        public void ExecuteSqlList(string connectionstring, string[] oSqlList)
+        {
+            if (oSqlList != null && oSqlList.Length > 0)
+            {
+                log.LogDebug("--- Start - Sql List ---");
+                int i = 1;
+                foreach (string oSql in oSqlList)
+                {
+                    log.LogInformation("  >  Update {0} / {1}", i, oSqlList.Length);
+                    ExecuteNonQuery(connectionstring, oSql);
+                    i++;
+                }
+                log.LogDebug("--- Finish - Sql List ---");
+            }
         }
 
     }
