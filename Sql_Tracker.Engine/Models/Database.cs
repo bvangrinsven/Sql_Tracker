@@ -16,6 +16,17 @@ namespace Sql_Tracker.Engine.Models
         public DateTime DateCreated { get; set; }
         public DateTime DateModified { get; set; }
 
+        public string GetAll()
+        {
+            string Sql = "SELECT " + Environment.NewLine;
+            Sql += "[ServerGUID], [GUIDDatabase], [Name], [IsDeleted], [DateCreated], [DateModified]" + Environment.NewLine;
+            Sql += "FROM [dbo].[tblDatabases] WITH(NOLOCK) " + Environment.NewLine;
+            Sql += "WHERE " + Environment.NewLine;
+            Sql += "[IsDeleted] = 0 " + Environment.NewLine;
+
+            return Sql;
+        }
+
         public string GetObjectsSql()
         {
             return "SELECT @ServerGUID as ServerGUID, " +

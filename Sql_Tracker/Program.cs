@@ -85,13 +85,15 @@ namespace Sql_Tracker
                     credtesting.Execute();
                 }
 
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    log.LogInformation("Press Any key to continue . . . ");
+                    Console.ReadKey(true);
+                }
+
+
             }
 
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                Console.Write("Press Any key to continue . . . ");
-                Console.ReadKey(true);
-            }
         }
         private static void Run(Options opts)
         {

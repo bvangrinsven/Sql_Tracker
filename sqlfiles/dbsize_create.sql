@@ -1,8 +1,19 @@
+CREATE TYPE [dbo].[tblDatabaseSizes] AS TABLE(
+	[ServerGUID] varchar(36)
+    , [DatabaseFileName] varchar(200)
+    , [CurrentFileSizeMB] decimal(18,0)
+    , [TotalDBSizeMB] decimal(18,0)
+    , [DateReported] datetime
+    , [MonthReported] int
+    , [YearReported] int
+    , [WeekNumReported] int
+)
+GO
+
 CREATE TABLE [dbo].[tblDatabaseSize](
 	[UIDDatabaseSize] [int] IDENTITY(1,1) NOT NULL,
 	[GUIDDatabaseSize] [varchar](36) NOT NULL,
 	[DatabaseGUID] [varchar](36) NOT NULL,
-	[DatabaseFileName] [varchar](200) NOT NULL,
 	[CurrentFileSizeMB] [int] NOT NULL,
 	[TotalDBSizeMB] [int] NOT NULL,
 	[DateReported] [datetime] NOT NULL,

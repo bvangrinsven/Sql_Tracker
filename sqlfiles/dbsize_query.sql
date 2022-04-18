@@ -1,18 +1,26 @@
-SELECT
-    m.name AS DatabaseFileName,
-    m.size * 8/1024 as CurrentFileSizeMB,
-    SUM(m.size * 8/1024) OVER (PARTITION BY d.name) AS TotalDBSizeMB
-FROM sys.master_files m
-INNER JOIN sys.databases d ON
-d.database_id = m.database_id;
-
-
-/*
-SELECT f.name AS [File Name] , f.physical_name AS [Physical Name], 
-CAST((f.size/128.0) AS DECIMAL(15,2)) AS [Total Size in MB],
-CAST(f.size/128.0 - CAST(FILEPROPERTY(f.name, 'SpaceUsed') AS int)/128.0 AS DECIMAL(15,2)) 
-AS [Available Space In MB], [file_id], fg.name AS [Filegroup Name]
-FROM sys.database_files AS f WITH (NOLOCK) 
-LEFT OUTER JOIN sys.data_spaces AS fg WITH (NOLOCK) 
-ON f.data_space_id = fg.data_space_id OPTION (RECOMPILE);
-*/
+CREATE TABLE #FileSize
+(dbName NVARCHAR(128), 
+    FileName NVARCHAR(128), 
+    type_desc NVARCHAR(128),
+    CurrentSizeMB DECIMAL(10,2), 
+    FreeSpaceMB DECIMAL(10,2)
+);
+    
+INSERT INTO #FileSize(dbName, FileName, type_desc, CurrentSizeMB, FreeSpaceMB)
+exec sp_msforeachdb 
+'use [?]; 
+ SELECT DB_NAME() AS DbName, 
+        name AS FileName, 
+        type_desc,
+        size/128.0 AS CurrentSizeMB,  
+        size/128.0 - CAST(FILEPROPERTY(name, ''SpaceUsed'') AS INT)/128.0 AS FreeSpaceMB
+FROM sys.database_files
+WHERE type IN (0,1);';
+    
+SELECT @ServerGUID as ServerGUID, 
+dbName as DatabaseName, SUM(CurrentSizeMB) - SUM(FreeSpaceMB) as [UsedSizeMB], SUM(CurrentSizeMB) as [TotalDBSizeMB]
+, @DateReported as DateReported, @MonthReported as MonthReported, @YearReported as YearReported, @WeekNumReported as WeekNumReported
+FROM #FileSize 
+GROUP BY dbName;
+    
+DROP TABLE #FileSize;

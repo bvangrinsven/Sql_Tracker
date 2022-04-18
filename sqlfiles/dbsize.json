@@ -6,5 +6,5 @@
     "existstablefile":"dbsize_exists.sql",
     "createtablefile":"dbsize_create.sql",
     "insertrecordfile":"dbsize_insert.sql",
-    "tablename": "tblDatabaseSize"
+    "tablename": "tblDatabaseSizes"
 }

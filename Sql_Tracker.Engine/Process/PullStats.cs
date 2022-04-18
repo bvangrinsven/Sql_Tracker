@@ -10,6 +10,7 @@ using Sql_Tracker.Engine.Utilz;
 using Sql_Tracker.Engine.Factories;
 using Sql_Tracker.Engine.Models;
 using System.Data;
+using Sql_Tracker.Engine.Utilz.Extensions;
 
 namespace Sql_Tracker.Engine.Process
 {
@@ -54,19 +55,30 @@ namespace Sql_Tracker.Engine.Process
                 queryFiles.Add(qFileInfo);
             }
 
+            DateTime ReportDate = DateTime.Now;
+
+            QueryParameter[] iParams = new QueryParameter[6];
+            iParams[0] = new QueryParameter() { DbType = DbType.String, Name = "ServerGUID", Size = 36 };
+            iParams[1] = new QueryParameter() { DbType = DbType.String, Name = "DatabaseGUID", Size = 36 };
+            iParams[2] = new QueryParameter() { DbType = DbType.String, Name = "DatabaseTableGUID", Size = 36 };
+            iParams[3] = new QueryParameter() { DbType = DbType.DateTime, Name = "DateReported", Value = ReportDate };
+            iParams[4] = new QueryParameter() { DbType = DbType.Int32, Name = "MonthReported", Value = ReportDate.Month };
+            iParams[5] = new QueryParameter() { DbType = DbType.Int32, Name = "YearReported", Value = ReportDate.Year };
+            iParams[6] = new QueryParameter() { DbType = DbType.Int32, Name = "WeekNumReported", Value = ReportDate.GetIso8601WeekOfYear() };
+
             log.LogInformation("Execute Server Level Stats");
-            ExecuteSpecificLevel(servers, databases, databaseTables, queryFiles, Constants.QueryType.PullServerStats);
+            ExecuteSpecificLevel(servers, databases, databaseTables, queryFiles, Constants.QueryType.PullServerStats, iParams);
 
             log.LogInformation("Execute Database Level Stats");
-            ExecuteSpecificLevel(servers, databases, databaseTables, queryFiles, Constants.QueryType.PullDataBaseStats);
+            ExecuteSpecificLevel(servers, databases, databaseTables, queryFiles, Constants.QueryType.PullDataBaseStats, iParams);
 
             log.LogInformation("Execute Table Level Stats");
-            ExecuteSpecificLevel(servers, databases, databaseTables, queryFiles, Constants.QueryType.PullTableStats);
+            ExecuteSpecificLevel(servers, databases, databaseTables, queryFiles, Constants.QueryType.PullTableStats, iParams);
 
         }
 
 
-        private void ExecuteSpecificLevel(List<Server> servers, List<Database> databases, List<DatabaseTable> databaseTables, List<QueryFileInfo> queryFiles, Constants.QueryType queryType)
+        private void ExecuteSpecificLevel(List<Server> servers, List<Database> databases, List<DatabaseTable> databaseTables, List<QueryFileInfo> queryFiles, Constants.QueryType queryType, QueryParameter[] inParams)
         {
 
             // Get all Queries to Execute
@@ -76,98 +88,122 @@ namespace Sql_Tracker.Engine.Process
             foreach (Server server in servers)
             {
 
+                inParams[0].Value = server.GUIDServer;
+
+                string connStr = server.ConnectionString
+                    .Replace("{{database}}", "master")
+                    .Replace("{{monitoruser}}", Setting.GetUsername(server.Name))
+                    .Replace("{{monitorpass}}", Setting.GetPassword(server.Name));
+
                 if (queryType == Constants.QueryType.PullServerStats)
                 {
                     foreach (QueryFileInfo query in specificLevel)
                     {
-                        LogQuery(query, server);
+                        LogQuery(connStr, query, server);
                     }
                 }
 
-                // Loop through the Databases
-                List<Database> _database = databases.Where<Database>(x => x.ServerGUID == server.GUIDServer).ToList();
-
-                foreach (Database db in _database)
+                if (queryType == Constants.QueryType.PullDataBaseStats)
                 {
-                    if (queryType == Constants.QueryType.PullDataBaseStats)
+                    // Loop through the Databases
+                    List<Database> _database = databases.Where<Database>(x => x.ServerGUID == server.GUIDServer).ToList();
+
+                    foreach (Database db in _database)
                     {
+                        inParams[1].Value = db.GUIDDatabase;
+
+                        connStr = server.ConnectionString
+                            .Replace("{{database}}", db.Name)
+                            .Replace("{{monitoruser}}", Setting.GetUsername(server.Name))
+                            .Replace("{{monitorpass}}", Setting.GetPassword(server.Name));
+
                         foreach (QueryFileInfo query in specificLevel)
                         {
-                            LogQuery(query, db);
+                            LogQuery(connStr, query, db);
                         }
-                    }
 
-                    List<DatabaseTable> _dbt = databaseTables.Where<DatabaseTable>(x => x.DatabaseGUID == db.GUIDDatabase).ToList();
-                    // Loop through the Tables
-
-                    foreach (DatabaseTable databaseTable in _dbt)
-                    {
+                        // Loop through the Tables
+                        // Pull Table Level Stats at a whole to dump into Table
+                        /*
                         if (queryType == Constants.QueryType.PullTableStats)
                         {
-                            foreach (QueryFileInfo query in specificLevel)
+                            List<DatabaseTable> _dbt = databaseTables.Where<DatabaseTable>(x => x.DatabaseGUID == db.GUIDDatabase).ToList();
+                            foreach (DatabaseTable databaseTable in _dbt)
                             {
-                                LogQuery(query, db, databaseTable);
+                                inParams[3].Value = databaseTable.GUIDDatabaseTable;
+                                if (queryType == Constants.QueryType.PullTableStats)
+                                {
+                                    foreach (QueryFileInfo query in specificLevel)
+                                    {
+                                        LogQuery(connStr, query, db, databaseTable);
+                                    }
+                                }
+                                inParams[3].Value = string.Empty;
                             }
                         }
-                    }
+                        */
 
+                        inParams[1].Value = string.Empty;
+                    }
                 }
+
+                inParams[0].Value = string.Empty;
             }
         }
 
-        public void LogQuery(QueryFileInfo queryFile, Server server)
+        public void LogQuery(string sourceConnStr, QueryFileInfo queryFile, Server server)
         {
             string querySql;
             string insertSql;
 
             if (GetQueryInsertContent(queryFile, out querySql, out insertSql))
             {
-                DataTable dt = _db.ExecuteDataTable(querySql, server.ConnectionString);
+                DataTable dt = _db.ExecuteDataTable(querySql, sourceConnStr);
 
                 if (dt != null && dt.Rows.Count > 0)
                 {
                     QueryParameter[] inParams = Generator.CreateQueryParametersFromDT(dt);
                     inParams.Prepend(new QueryParameter() { DbType = DbType.String, Name = "ServerGUID", Size = 36, Value = server.GUIDServer });
 
-                    HandleRows(inParams, insertSql, dt);
+                    //HandleRows(inParams, insertSql, dt);
                 }
             }
         }
 
-        public void LogQuery(QueryFileInfo queryFile, Database database)
+        public void LogQuery(string sourceConnStr, QueryFileInfo queryFile, Database database)
         {
             string querySql;
             string insertSql;
 
             if (GetQueryInsertContent(queryFile, out querySql, out insertSql))
             {
-                DataTable dt = _db.ExecuteDataTable(querySql, database.ConnectionString);
+                DataTable dt = _db.ExecuteDataTable(querySql, sourceConnStr);
 
-                if (dt != null && dt.Rows.Count > 0)
+                if (dt.IsValid())
                 {
                     QueryParameter[] inParams = Generator.CreateQueryParametersFromDT(dt);
                     inParams.Prepend(new QueryParameter() { DbType = DbType.String, Name = "DatabaseGUID", Size = 36, Value = database.GUIDDatabase });
 
-                    HandleRows(inParams, insertSql, dt);
+                    //HandleRows(inParams, insertSql, dt);
                 }
             }
         }
 
-        public void LogQuery(QueryFileInfo queryFile, Database database, DatabaseTable databaseTable)
+        public void LogQuery(string sourceConnStr, QueryFileInfo queryFile, Database database, DatabaseTable databaseTable)
         {
             string querySql;
             string insertSql;
 
             if (GetQueryInsertContent(queryFile, out querySql, out insertSql))
             {
-                DataTable dt = _db.ExecuteDataTable(querySql, database.ConnectionString);
+                DataTable dt = _db.ExecuteDataTable(querySql, sourceConnStr);
 
-                if (dt != null && dt.Rows.Count > 0)
+                if (dt.IsValid())
                 {
                     QueryParameter[] inParams = Generator.CreateQueryParametersFromDT(dt);
                     inParams.Prepend(new QueryParameter() { DbType = DbType.String, Name = "DatabaseTableGUID", Size = 36, Value = databaseTable.GUIDDatabaseTable });
 
-                    HandleRows(inParams, insertSql, dt);
+                    //HandleRows(inParams, insertSql, dt);
                 }
             }
         }
@@ -191,21 +227,21 @@ namespace Sql_Tracker.Engine.Process
             }
         }
 
-        private void HandleRows(QueryParameter[] inParams, string insertSql, DataTable dt)
-        {
-            foreach (DataRow oRow in dt.Rows)
-            {
-                QueryParameter[] outParams = new QueryParameter[inParams.Length];
-                Array.Copy(inParams, outParams, inParams.Length);
+        //private void HandleRows(QueryParameter[] inParams, string insertSql, DataTable dt)
+        //{
+        //    foreach (DataRow oRow in dt.Rows)
+        //    {
+        //        QueryParameter[] outParams = new QueryParameter[inParams.Length];
+        //        Array.Copy(inParams, outParams, inParams.Length);
 
-                for (int i = 0; i < outParams.Length; i++)
-                {
-                    outParams[i].Value = oRow[outParams[i].Name];
-                }
+        //        for (int i = 0; i < outParams.Length; i++)
+        //        {
+        //            outParams[i].Value = oRow[outParams[i].Name];
+        //        }
 
-                _db.ExecuteNonQuery(insertSql, outParams);
-            }
-        }
+        //        _db.ExecuteNonQuery(insertSql, outParams);
+        //    }
+        //}
 
     }
 }

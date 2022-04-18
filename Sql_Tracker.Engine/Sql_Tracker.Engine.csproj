@@ -150,6 +150,7 @@
     <Compile Include="Models\QueryParameter.cs" />
     <Compile Include="Models\DatabaseTable.cs" />
     <Compile Include="Models\ServerDisk.cs" />
+    <Compile Include="Models\ServerSqlJob.cs" />
     <Compile Include="Process\CredTest.cs" />
     <Compile Include="Process\InitDB.cs" />
     <Compile Include="Process\PopulateServer.cs" />
@@ -163,6 +164,7 @@
     <Compile Include="Utilz\Constants.cs" />
     <Compile Include="Utilz\Extensions\DataRowExt.cs" />
     <Compile Include="Utilz\Extensions\DataTableExt.cs" />
+    <Compile Include="Utilz\Extensions\DateTimeHandlers.cs" />
     <Compile Include="Utilz\Extensions\Validate.cs" />
     <Compile Include="Utilz\Generator.cs" />
     <Compile Include="Utilz\Settings.cs" />
