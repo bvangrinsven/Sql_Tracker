@@ -1,0 +1,10 @@
+{
+    "id":"dc37f940-b9b4-4d64-babe-dd77f30612bf",
+    "name": "DatabaseTableSize",
+    "querytype": 2,
+    "queryfile":"dbtablesize_query.sql",
+    "existstablefile":"",
+    "createtablefile":"dbtablesize_create.sql",
+    "insertrecordfile":"dbtablesize_insert.sql",
+    "tablename": "tblDatabaseTableSizes"
+}

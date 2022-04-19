@@ -95,6 +95,7 @@ namespace Sql_Tracker
             }
 
         }
+
         private static void Run(Options opts)
         {
             options = opts;

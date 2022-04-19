@@ -162,6 +162,7 @@
     <Compile Include="Utilz\Config.cs" />
     <Compile Include="DataAccess\MssqlDBExecute.cs" />
     <Compile Include="Utilz\Constants.cs" />
+    <Compile Include="Utilz\Debugging.cs" />
     <Compile Include="Utilz\Extensions\DataRowExt.cs" />
     <Compile Include="Utilz\Extensions\DataTableExt.cs" />
     <Compile Include="Utilz\Extensions\DateTimeHandlers.cs" />

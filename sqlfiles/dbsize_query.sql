@@ -7,7 +7,7 @@ CREATE TABLE #FileSize
 );
     
 INSERT INTO #FileSize(dbName, FileName, type_desc, CurrentSizeMB, FreeSpaceMB)
-exec sp_msforeachdb 
+exec sp_MSforeachdb 
 'use [?]; 
  SELECT DB_NAME() AS DbName, 
         name AS FileName, 
@@ -17,9 +17,15 @@ exec sp_msforeachdb
 FROM sys.database_files
 WHERE type IN (0,1);';
     
-SELECT @ServerGUID as ServerGUID, 
-dbName as DatabaseName, SUM(CurrentSizeMB) - SUM(FreeSpaceMB) as [UsedSizeMB], SUM(CurrentSizeMB) as [TotalDBSizeMB]
-, @DateReported as DateReported, @MonthReported as MonthReported, @YearReported as YearReported, @WeekNumReported as WeekNumReported
+SELECT 
+    @ServerGUID as ServerGUID, 
+    dbName as DatabaseName, 
+    SUM(CurrentSizeMB) - SUM(FreeSpaceMB) as [CurrentFileSizeMB], 
+    SUM(CurrentSizeMB) as [TotalDBSizeMB], 
+    @DateReported as DateReported, 
+    @MonthReported as MonthReported, 
+    @YearReported as YearReported, 
+    @WeekNumReported as WeekNumReported
 FROM #FileSize 
 GROUP BY dbName;
     

@@ -1,13 +1,16 @@
 SELECT 
-    t.NAME AS TableName,
-    s.Name AS SchemaName,
-    p.rows,
-    SUM(a.total_pages) * 8 AS TotalSpaceKB, 
-    CAST(ROUND(((SUM(a.total_pages) * 8) / 1024.00), 2) AS NUMERIC(36, 2)) AS TotalSpaceMB,
-    SUM(a.used_pages) * 8 AS UsedSpaceKB, 
-    CAST(ROUND(((SUM(a.used_pages) * 8) / 1024.00), 2) AS NUMERIC(36, 2)) AS UsedSpaceMB, 
-    (SUM(a.total_pages) - SUM(a.used_pages)) * 8 AS UnusedSpaceKB,
-    CAST(ROUND(((SUM(a.total_pages) - SUM(a.used_pages)) * 8) / 1024.00, 2) AS NUMERIC(36, 2)) AS UnusedSpaceMB
+    @ServerGUID as [ServerGUID], 
+    @DatabaseGUID as [DatabaseGUID],
+    t.NAME AS [TableName],
+    s.Name AS [SchemaName],
+    p.rows as [RowsCount],
+    CAST(ROUND(((SUM(a.total_pages) * 8) / 1024.00), 2) AS NUMERIC(36, 2)) AS [TotalSpaceMB],
+    CAST(ROUND(((SUM(a.used_pages) * 8) / 1024.00), 2) AS NUMERIC(36, 2)) AS [UsedSpaceMB], 
+    CAST(ROUND(((SUM(a.total_pages) - SUM(a.used_pages)) * 8) / 1024.00, 2) AS NUMERIC(36, 2)) AS [UnusedSpaceMB],
+    @DateReported as DateReported, 
+    @MonthReported as MonthReported, 
+    @YearReported as YearReported, 
+    @WeekNumReported as WeekNumReported
 FROM 
     sys.tables t
 INNER JOIN      

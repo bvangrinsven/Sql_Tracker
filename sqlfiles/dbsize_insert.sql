@@ -1,17 +1,9 @@
-INSERT INTO [dbo].[tblDatabaseSize]
-    ([DatabaseGUID]
-    ,[DatabaseFileName]
-    ,[CurrentFileSizeMB]
-    ,[TotalDBSizeMB]
-    ,[DateReported]
-    ,[MonthReported]
-    ,[YearReported]
-    ,[WeekNumReported])
-
+BEGIN TRANSACTION;
 INSERT INTO [dbo].[tblDatabaseSizes] (
 [DatabaseGUID], [CurrentFileSizeMB], [TotalDBSizeMB], [DateReported], [MonthReported], [YearReported], [WeekNumReported]
 ) 
-SELECT [tS].[DatabaseGUID], [tS].[CurrentFileSizeMB], [tS].[TotalDBSizeMB], [tS].[DateReported], [tS].[MonthReported], [tS].[YearReported], [tS].[WeekNumReported]
+SELECT tD.[GUIDDatabase], [tS].[CurrentFileSizeMB], [tS].[TotalDBSizeMB], [tS].[DateReported], [tS].[MonthReported], [tS].[YearReported], [tS].[WeekNumReported]
 FROM @inputTable as tS
-LEFT OUTER JOIN [dbo].[tblDatabases] as tD ON td.ServerGUID = tS.ServerGUID AND tD.[Name] = tS.[DatabaseName]
+INNER JOIN [dbo].[tblDatabases] as tD ON td.ServerGUID = tS.ServerGUID AND tD.[Name] = tS.[DatabaseName]
 ;
+COMMIT TRANSACTION;

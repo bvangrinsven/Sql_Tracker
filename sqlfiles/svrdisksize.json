@@ -1,0 +1,11 @@
+
+{
+    "id":"9bac9725-6abb-4dc5-8c9b-cd9eaa753d5f",
+    "name": "Server Disk Size",
+    "querytype": 1,
+    "queryfile":"svrdisksize_query.sql",
+    "existstablefile":"",
+    "createtablefile":"svrdisksize_create.sql",
+    "insertrecordfile":"svrdisksize_insert.sql",
+    "tablename": "tblServerDiskSizes"
+}

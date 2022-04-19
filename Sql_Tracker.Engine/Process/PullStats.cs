@@ -34,9 +34,9 @@ namespace Sql_Tracker.Engine.Process
         {
             log.LogInformation("Starting Pulling of Stats");
             
-            Server server = null;
-            Database database = null;
-            DatabaseTable databaseTable = null;
+            Server server = new Server();
+            Database database = new Database();
+            DatabaseTable databaseTable = new DatabaseTable();
 
             if (sqlFilesPath.StartsWith("."))
                 sqlFilesPath = Path.GetFullPath(Path.Combine(Generator.GetAssemblyPath(), sqlFilesPath));
@@ -59,7 +59,7 @@ namespace Sql_Tracker.Engine.Process
 
             DateTime ReportDate = DateTime.Now;
 
-            QueryParameter[] iParams = new QueryParameter[6];
+            QueryParameter[] iParams = new QueryParameter[7];
             iParams[0] = new QueryParameter() { DbType = DbType.String, Name = "ServerGUID", Size = 36 };
             iParams[1] = new QueryParameter() { DbType = DbType.String, Name = "DatabaseGUID", Size = 36 };
             iParams[2] = new QueryParameter() { DbType = DbType.String, Name = "DatabaseTableGUID", Size = 36 };
@@ -160,10 +160,12 @@ namespace Sql_Tracker.Engine.Process
 
             if (GetQueryInsertContent(queryFile, out querySql, out insertSql))
             {
-                DataTable dt = _db.ExecuteDataTable(querySql, sourceConnStr);
+                DataTable dt = _db.ExecuteDataTable(querySql, sourceConnStr, inParams);
 
                 if (dt.IsValid())
                 {
+                    Debugging.PeekDataTable(log, dt);
+
                     _db.ExecuteUpSert(dt, insertSql, queryFile.TableName, inParams);
 
                     //HandleRows(inParams, insertSql, dt);

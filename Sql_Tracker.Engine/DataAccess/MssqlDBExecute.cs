@@ -122,8 +122,9 @@ namespace Sql_Tracker.Engine.DataAccess
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Commit Exception Type: {0}", ex.GetType());
-                    Console.WriteLine("  Message: {0}", ex.Message);
+                    log.LogError(ex, "Commit Exception Type: {0}", ex.GetType());
+                    log.LogError("Message: {0}", ex.Message);
+                    log.LogError("Sql Statement: {0}", commandText);
                     tran.Rollback();
                 }
 
@@ -309,8 +310,8 @@ namespace Sql_Tracker.Engine.DataAccess
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Commit Exception Type: {0}", ex.GetType());
-                    Console.WriteLine("  Message: {0}", ex.Message);
+                    log.LogError(ex, "Commit Exception Type: {0}", ex.GetType());
+                    log.LogError(ex, "  Message: {0}", ex.Message);
                 }
 
                 return retval;
@@ -332,7 +333,7 @@ namespace Sql_Tracker.Engine.DataAccess
                 if (sourceData.IsValid())
                 {
 
-                    Console.WriteLine("    >> Pushing {0} - {1} to the Destination Database.", sourceData.Rows.Count, DataTableTypeName);
+                    log.LogInformation("    >> Rows: {0} - Table: {1}", sourceData.Rows.Count, DataTableTypeName);
 
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {

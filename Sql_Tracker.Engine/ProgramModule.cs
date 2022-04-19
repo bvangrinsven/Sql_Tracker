@@ -23,6 +23,8 @@ namespace Sql_Tracker.Engine
                 .WithOverwriteExistingVars()
                 .Load();
 
+            builder.RegisterType<Config>().As<IConfig>().SingleInstance();
+
             builder.Register(handler => LoggerFactory.Create(ConfigureLogging))
                 .As<ILoggerFactory>()
                 .SingleInstance()
@@ -32,7 +34,6 @@ namespace Sql_Tracker.Engine
                 .As(typeof(ILogger<>))
                 .SingleInstance();
 
-            builder.RegisterType<Config>().As<IConfig>().SingleInstance();
             builder.RegisterType<Settings>().As<ISettings>().SingleInstance();
 
             builder.RegisterType<MssqlDBExecute>().As<IDBExecute>().SingleInstance();
@@ -48,9 +49,11 @@ namespace Sql_Tracker.Engine
 
         private static void ConfigureLogging(ILoggingBuilder log)
         {
-            log.ClearProviders();
-            log.SetMinimumLevel(LogLevel.Information);
-            log.AddSimpleConsole(options =>
+
+            //config.GetInt("Logging__LogLevel__Microsoft");
+
+            log.ClearProviders()
+            .AddSimpleConsole(options =>
             {
                 options.IncludeScopes = true;
                 options.SingleLine = true;
