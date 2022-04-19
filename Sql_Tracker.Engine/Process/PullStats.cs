@@ -33,15 +33,17 @@ namespace Sql_Tracker.Engine.Process
         public void Execute()
         {
             log.LogInformation("Starting Pulling of Stats");
-
-            log.LogInformation("Starting Initialization of Database");
+            
+            Server server = null;
+            Database database = null;
+            DatabaseTable databaseTable = null;
 
             if (sqlFilesPath.StartsWith("."))
                 sqlFilesPath = Path.GetFullPath(Path.Combine(Generator.GetAssemblyPath(), sqlFilesPath));
 
-            List<Server> servers = Generator.ConvertDataTable<Server>(_db.ExecuteDataTable(Constants.Queries.ServerList));
-            List<Database> databases = Generator.ConvertDataTable<Database>(_db.ExecuteDataTable(Constants.Queries.DatabaseList));
-            List<DatabaseTable> databaseTables = Generator.ConvertDataTable<DatabaseTable>(_db.ExecuteDataTable(Constants.Queries.TableList));
+            List<Server> servers = Generator.ConvertDataTable<Server>(_db.ExecuteDataTable(server.GetAll()));
+            List<Database> databases = Generator.ConvertDataTable<Database>(_db.ExecuteDataTable(database.GetAll()));
+            List<DatabaseTable> databaseTables = Generator.ConvertDataTable<DatabaseTable>(_db.ExecuteDataTable(databaseTable.GetAll()));
 
             List<QueryFileInfo> queryFiles = new List<QueryFileInfo>();
 
@@ -99,7 +101,7 @@ namespace Sql_Tracker.Engine.Process
                 {
                     foreach (QueryFileInfo query in specificLevel)
                     {
-                        LogQuery(connStr, query, server);
+                        LogQuery(connStr, query, inParams);
                     }
                 }
 
@@ -119,7 +121,7 @@ namespace Sql_Tracker.Engine.Process
 
                         foreach (QueryFileInfo query in specificLevel)
                         {
-                            LogQuery(connStr, query, db);
+                            LogQuery(connStr, query, inParams);
                         }
 
                         // Loop through the Tables
@@ -151,26 +153,7 @@ namespace Sql_Tracker.Engine.Process
             }
         }
 
-        public void LogQuery(string sourceConnStr, QueryFileInfo queryFile, Server server)
-        {
-            string querySql;
-            string insertSql;
-
-            if (GetQueryInsertContent(queryFile, out querySql, out insertSql))
-            {
-                DataTable dt = _db.ExecuteDataTable(querySql, sourceConnStr);
-
-                if (dt != null && dt.Rows.Count > 0)
-                {
-                    QueryParameter[] inParams = Generator.CreateQueryParametersFromDT(dt);
-                    inParams.Prepend(new QueryParameter() { DbType = DbType.String, Name = "ServerGUID", Size = 36, Value = server.GUIDServer });
-
-                    //HandleRows(inParams, insertSql, dt);
-                }
-            }
-        }
-
-        public void LogQuery(string sourceConnStr, QueryFileInfo queryFile, Database database)
+        public void LogQuery(string sourceConnStr, QueryFileInfo queryFile, QueryParameter[] inParams)
         {
             string querySql;
             string insertSql;
@@ -181,32 +164,50 @@ namespace Sql_Tracker.Engine.Process
 
                 if (dt.IsValid())
                 {
-                    QueryParameter[] inParams = Generator.CreateQueryParametersFromDT(dt);
-                    inParams.Prepend(new QueryParameter() { DbType = DbType.String, Name = "DatabaseGUID", Size = 36, Value = database.GUIDDatabase });
+                    _db.ExecuteUpSert(dt, insertSql, queryFile.TableName, inParams);
 
                     //HandleRows(inParams, insertSql, dt);
                 }
             }
         }
 
-        public void LogQuery(string sourceConnStr, QueryFileInfo queryFile, Database database, DatabaseTable databaseTable)
-        {
-            string querySql;
-            string insertSql;
+        //public void LogQuery(string sourceConnStr, QueryFileInfo queryFile, Database database)
+        //{
+        //    string querySql;
+        //    string insertSql;
 
-            if (GetQueryInsertContent(queryFile, out querySql, out insertSql))
-            {
-                DataTable dt = _db.ExecuteDataTable(querySql, sourceConnStr);
+        //    if (GetQueryInsertContent(queryFile, out querySql, out insertSql))
+        //    {
+        //        DataTable dt = _db.ExecuteDataTable(querySql, sourceConnStr);
 
-                if (dt.IsValid())
-                {
-                    QueryParameter[] inParams = Generator.CreateQueryParametersFromDT(dt);
-                    inParams.Prepend(new QueryParameter() { DbType = DbType.String, Name = "DatabaseTableGUID", Size = 36, Value = databaseTable.GUIDDatabaseTable });
+        //        if (dt.IsValid())
+        //        {
+        //            QueryParameter[] inParams = Generator.CreateQueryParametersFromDT(dt);
+        //            inParams.Prepend(new QueryParameter() { DbType = DbType.String, Name = "DatabaseGUID", Size = 36, Value = database.GUIDDatabase });
 
-                    //HandleRows(inParams, insertSql, dt);
-                }
-            }
-        }
+        //            //HandleRows(inParams, insertSql, dt);
+        //        }
+        //    }
+        //}
+
+        //public void LogQuery(string sourceConnStr, QueryFileInfo queryFile, Database database, DatabaseTable databaseTable)
+        //{
+        //    string querySql;
+        //    string insertSql;
+
+        //    if (GetQueryInsertContent(queryFile, out querySql, out insertSql))
+        //    {
+        //        DataTable dt = _db.ExecuteDataTable(querySql, sourceConnStr);
+
+        //        if (dt.IsValid())
+        //        {
+        //            QueryParameter[] inParams = Generator.CreateQueryParametersFromDT(dt);
+        //            inParams.Prepend(new QueryParameter() { DbType = DbType.String, Name = "DatabaseTableGUID", Size = 36, Value = databaseTable.GUIDDatabaseTable });
+
+        //            //HandleRows(inParams, insertSql, dt);
+        //        }
+        //    }
+        //}
 
         private bool GetQueryInsertContent(QueryFileInfo queryFile, out string querySql, out string insertSql)
         {
